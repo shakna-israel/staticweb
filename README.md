@@ -74,7 +74,7 @@ This is a 0-dependency library for creating static websites whilst making the pr
 
 # Documentation
 
-TODO
+See the `docs` folder.
 
 ---
 
