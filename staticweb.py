@@ -36,6 +36,7 @@ import pathlib
 import json
 import html
 import logging
+import http.cookies
 
 routes = {}
 sources = {}
@@ -128,6 +129,8 @@ class HTMLResponse(object):
 			self.head.appendChild(title_el)
 
 		self.lang = lang
+
+		self.cookies = http.cookies.SimpleCookie()
 
 		logging.debug("New HTMLResponse: {}".format(self.as_dict()))
 
@@ -234,7 +237,10 @@ class HTMLResponse(object):
 		# Allow chaining
 		return self
 
-	# TODO: A set_cookie helper compatible with JS
+	def set_cookie(self, key, value):
+		self.cookies[key] = value
+
+		return self
 
 	def http_header(self, header, content):
 		logging.debug("Create a http-equiv element via convenience helper: <{}> <{}>".format(header, content))
@@ -284,6 +290,12 @@ class HTMLResponse(object):
 
 		# Handle quirks!
 		self.verify()
+
+		# Add cookies...
+		cookie_strings = [x for x in self.cookies.output().split('\r\n') if x]
+		cookie_strings = [x.partition(":")[2].lstrip() for x in cookie_strings]
+		for cookie in cookie_strings:
+			self.http_header('Set-Cookie', cookie)
 
 		if self.lang:
 			return """<!DOCTYPE {doctype}>

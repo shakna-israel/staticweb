@@ -23,6 +23,8 @@ def index():
 
 	r.body.appendChild(content)
 
+	r.set_cookie("session", "hello")
+
 	return r
 
 @staticweb.route("/gen/{username:get_user}")
@@ -44,7 +46,7 @@ def datafile2():
 
 @staticweb.route("/staticfile.py")
 def statfile():
-	return staticweb.sendfile("demo.py")
+	return staticweb.sendfile("example.py")
 
 if __name__ == "__main__":
 	staticweb.source(get_user=get_user, that=that)

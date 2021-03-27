@@ -64,6 +64,10 @@ This function will set the `lang` attribute to appear on the `html` element.
 
 This is a convenience function for adding a `meta http-equiv` element to the HTML `head` element.
 
+### `staticweb.HTMLResponse.set_cookie(self, key, value) -> self`
+
+This is a convenience function for setting basic cookies via `meta http-equiv` elements.
+
 ### `staticweb.HTMLResponse.as_dict(self) -> dict`
 
 This function returns a structured `dict` that can be freely modified representing the state of the given `HTMLResponse`.
