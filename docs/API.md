@@ -86,52 +86,94 @@ This calls `staticweb.HTMLResponse.compile`, allowing you to `print(HTMLResponse
 
 This constructs a base `HTMLElement` object.
 
-The given `element` should be a valid HTML tag name.
+The given `element` should be a valid HTML tag name or `"plain/text"`.
+
+The `"plain/text"` element is used to represent plain text, unenclosed by an element.
 
 ### `staticweb.HTMLElement.data`
 
-TODO
+This attribute of a base `HTMLElement` object is a dictionary, that will compile down to [dataset](https://developer.mozilla.org/en-US/docs/Web/API/HTMLOrForeignElement/dataset) attributes, and most of the caveats about key-naming from the spec follows.
+
+The values will be formatted, or attempted to be formatted, to fit as best the system can handle, but expect it to be a string in the end.
 
 ### `staticweb.HTMLElement.__dict__`
 
-TODO
+Any attributes added to a base `HTMLElement` object by the programmer will be attempted to be converted to HTML attributes upon compilation.
+
+A handful of attributes are reserved, and can be found under `HTMLElement.default_attributes`.
+
+There is no verification if an attribute makes sense and is allowed by the HTML spec - it is up to the programmer to do what makes sense.
+
+In the case of a `"plain/text"` element, you can also supply the `textContent` attribute to control its contents. (This usually would be treated like a normal attribute).
 
 ### `staticweb.HTMLElement.appendChild(self, childElement: staticweb.HTMLElement) -> self`
 
-TODO
+Appends a given element as the last child of the original `HTMLElement` object.
+
+If the element is in the list of HTML void elements (self-closing), it may raise a `RuntimeError`.
 
 ### `staticweb.HTMLElement.prependChild(self, childElement: staticweb.HTMLElement) -> self`
 
-TODO
+Works the same as `staticweb.HTMLElement.appendChild`, but it prepends to the list of children, instead of appending.
 
 ### `staticweb.HTMLElement.addText(self, some_text: str) -> self`
 
-TODO
+This creates a `"plain/text"` element, containing the given string, and appends it to the list of children.
+
+This is a convenience method.
 
 ### `staticweb.HTMLElement.as_dict(self) -> dict`
 
-TODO
+This converts the given object into a `dict` representation.
 
 ### `staticweb.HTMLElement.from_dict(self, data) -> self`
 
-TODO
+Given a structured `dict`, like produced by `staticweb.HTMLElement.as_dict`, it will convert the current `HTMLElement` to match.
 
 ## `staticweb.HTMLView`
 
-TODO
+This is a decorator that will take a `dict` returned by a function route and attempt to generate a `HTMLResponse` from it, as given by something like `staticweb.HTMLResponse.from_dict`.
+
+See also `Decorators/staticweb.HTMLView` and `API/staticweb.HTMLResponse.from_dict`.
 
 ## `staticweb.redirect(path, timeout=0, message="Redirecting...") -> staticweb.HTMLResponse`
 
-TODO
+This will create a `staticweb.HTMLResponse` containing a `http-equiv` `Refresh` method for the given `path`.
 
-## `staticweb.route(path)`
+This is a convenience method.
 
-TODO
+## `staticweb.route(path: str)`
+
+This decorator links a given `path` to a `function`, and will be used to generate one or more files for the static site.
+
+The string given as a `path` should match Python's format specification, but where the `type specifier` matches a given `source`.
+
+For example:
+
+	@staticweb.route("/gen/{username:get_user}")
+	def gen(username):
+		return "Hello, {}".format(username)
+
+If the `path` does not end with a file extension, then the generated file will be found at `{path}/index.html`.
+
+Paths are parsed, using the given source functions to get all possible matches, and every possible combination will be created from that.
+
+_All_ dynamic parts of the URL will be passed to the underlying function, which should expect to receive them.
+
+See also `API/staticweb.source`, `Decorators/staticweb.route`, `Main Components/Routing`.
 
 ## `staticweb.compile(build_dir="_build", sources=None) -> None`
 
-TODO
+Optionally takes a dict as sources, which is sent to `staticweb.source`.
+
+This will attempt to create the given site under the given `build_dir` path. It won't attempt to clean or destroy any existing files that are not overwritten by the generated site.
+
+This should be called as one of the last parts of your program.
 
 ## `staticweb.run(build_dir="_build", PORT=8080) -> None`
 
-TODO
+This function doesn't call `staticweb.compile`, you'll need to do that on your own.
+
+All this does is spawn a simple and pathetic static file server using the given `build_dir` path on the given `PORT`.
+
+This is a convenience function.
